@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/libdns/libdns"
 )
@@ -93,6 +94,8 @@ func (p *Provider) getDNSRecords(ctx context.Context, zoneInfo netlifyZone, rec 
 func (p *Provider) getZoneInfo(ctx context.Context, zoneName string) (netlifyZone, error) {
 	p.zonesMu.Lock()
 	defer p.zonesMu.Unlock()
+
+	zoneName = strings.TrimRight(zoneName, ".")
 
 	// if we already got the zone info, reuse it
 	if p.zones == nil {
