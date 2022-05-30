@@ -17,11 +17,12 @@ type netlifyDNSRecord struct {
 
 func (r netlifyDNSRecord) libdnsRecord(zone string) libdns.Record {
 	return libdns.Record{
-		Type:  r.Type,
-		Name:  libdns.RelativeName(r.Hostname, zone),
-		Value: r.Value,
-		TTL:   time.Duration(r.TTL) * time.Second,
-		ID:    r.ID,
+		Type:     r.Type,
+		Name:     libdns.RelativeName(r.Hostname, zone),
+		Value:    r.Value,
+		TTL:      time.Duration(r.TTL) * time.Second,
+		ID:       r.ID,
+		Priority: int(r.Priority),
 	}
 }
 
