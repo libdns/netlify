@@ -88,6 +88,9 @@ func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []lib
 			if err != nil {
 				return nil, err
 			}
+			if len(exactMatches) == 0 {
+				return nil, fmt.Errorf("can't find DNS record %s", libdns.AbsoluteName(rec.Name, zoneInfo.Name))
+			}
 			for _, rec := range exactMatches {
 				deleteQueue = append(deleteQueue, rec.libdnsRecord(zone))
 			}
@@ -99,6 +102,10 @@ func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []lib
 			reqURL := fmt.Sprintf("%s/dns_zones/%s/dns_records/%s", baseURL, zoneInfo.ID, delRec.ID)
 
 			req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
+			if err != nil {
+				return nil, err
+			}
+
 			var result netlifyDNSRecord
 			err = p.doAPIRequest(req, false, false, true, true, &result)
 			if err != nil {

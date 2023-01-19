@@ -80,7 +80,7 @@ func (p *Provider) updateRecord(ctx context.Context, oldRec netlifyDNSRecord, ne
 }
 
 // getDNSRecords gets all record in a zone. It returns an array of the records
-// in the zone
+// in the zone. It may return an empty slice and a nil error.
 func (p *Provider) getDNSRecords(ctx context.Context, zoneInfo netlifyZone, rec libdns.Record, matchContent bool) ([]netlifyDNSRecord, error) {
 	qs := make(url.Values)
 	qs.Set("type", rec.Type)
@@ -102,9 +102,6 @@ func (p *Provider) getDNSRecords(ctx context.Context, zoneInfo netlifyZone, rec 
 		if res.Hostname == libdns.AbsoluteName(rec.Name, zoneInfo.Name) && res.Type == rec.Type {
 			rest_to_return = append(rest_to_return, res)
 		}
-	}
-	if len(rest_to_return) == 0 {
-		return nil, fmt.Errorf("Can't find DNS record %s", libdns.AbsoluteName(rec.Name, zoneInfo.Name))
 	}
 	if err != nil {
 		return nil, err
