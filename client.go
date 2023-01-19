@@ -39,14 +39,15 @@ func (p *Provider) createRecord(ctx context.Context, zoneInfo netlifyZone, recor
 // updateRecord updates a DNS record. oldRec must have both an ID and zone ID.
 // Only the non-empty fields in newRec will be changed.
 func (p *Provider) updateRecord(ctx context.Context, oldRec netlifyDNSRecord, newRec netlifyDNSRecord) (netlifyDNSRecord, error) {
-	reqURL := fmt.Sprintf("%s/dns_zones/%s/dns_records/%s", baseURL, oldRec.DNSZoneID, oldRec.ID)
+	zoneID := oldRec.DNSZoneID
+	// Temporary fix as currently the only way to update a dns record is to delete the previous one and to recreate one with the new specifications
+	reqURL := fmt.Sprintf("%s/dns_zones/%s/dns_records/%s", baseURL, zoneID, oldRec.ID)
 	jsonBytes, err := json.Marshal(newRec)
 	if err != nil {
 		return netlifyDNSRecord{}, err
 	}
 
-	// PATCH changes only the populated fields; PUT resets Type, Name, Content, and TTL even if empty
-	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, reqURL, bytes.NewReader(jsonBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, reqURL, bytes.NewReader(jsonBytes))
 	if err != nil {
 		return netlifyDNSRecord{}, err
 	}
@@ -54,7 +55,28 @@ func (p *Provider) updateRecord(ctx context.Context, oldRec netlifyDNSRecord, ne
 
 	var result netlifyDNSRecord
 	err = p.doAPIRequest(req, false, false, false, true, &result)
-	return result, err
+	if err != nil {
+		return netlifyDNSRecord{}, err
+	}
+
+	jsonEditBytes, err := json.Marshal(newRec)
+	if err != nil {
+		return netlifyDNSRecord{}, err
+	}
+	reqEditURL := fmt.Sprintf("%s/dns_zones/%s/dns_records", baseURL, zoneID)
+	reqEdit, err := http.NewRequestWithContext(ctx, http.MethodPost, reqEditURL, bytes.NewReader(jsonEditBytes))
+	if err != nil {
+		return netlifyDNSRecord{}, err
+	}
+	reqEdit.Header.Set("Content-Type", "application/json")
+
+	var resultEdit netlifyDNSRecord
+	err = p.doAPIRequest(reqEdit, false, false, false, true, &resultEdit)
+	if err != nil {
+		return netlifyDNSRecord{}, err
+	}
+
+	return resultEdit, err
 }
 
 // getDNSRecords gets all record in a zone. It returns an array of the records

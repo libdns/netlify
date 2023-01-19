@@ -63,6 +63,35 @@ func main() {
 
 		fmt.Println("appendedRecords")
 		fmt.Println(appendedRecords)
+
+		editedRecords, err := provider.SetRecords(context.TODO(), zone, []libdns.Record{
+			libdns.Record{
+				Type:  "TXT",
+				Name:  testName,
+				TTL:   0,
+				Value: "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw",
+			},
+		})
+
+		if err != nil {
+			log.Fatalln("ERROR: %s\n", err.Error())
+		}
+
+		records, err := provider.GetRecords(context.TODO(), zone)
+
+		if err != nil {
+			log.Fatalln("ERROR: %s\n", err.Error())
+		}
+
+		for _, record := range records {
+			if record.Name == testName {
+				if record.Value == "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw" {
+					fmt.Println("editedRecord")
+					fmt.Println(editedRecords)
+				}
+			}
+		}
+
 	} else {
 		deleteRecords, err := provider.DeleteRecords(context.TODO(), zone, []libdns.Record{
 			libdns.Record{
