@@ -92,11 +92,53 @@ func main() {
 			}
 		}
 
+		editedNoExistRecords, err := provider.SetRecords(context.TODO(), zone, []libdns.Record{
+			libdns.Record{
+				Type:  "TXT",
+				Name:  testName + ".no_exist",
+				TTL:   0,
+				Value: "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t",
+			},
+		})
+
+		if err != nil {
+			log.Fatalln("ERROR: %s\n", err.Error())
+		}
+
+		records, err = provider.GetRecords(context.TODO(), zone)
+
+		if err != nil {
+			log.Fatalln("ERROR: %s\n", err.Error())
+		}
+
+		for _, record := range records {
+			if record.Name == testName + ".no_exist" {
+				if record.Value == "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t" {
+					fmt.Println("editedNoExistRecord")
+					fmt.Println(editedNoExistRecords)
+				}
+			}
+		}
+
 	} else {
 		deleteRecords, err := provider.DeleteRecords(context.TODO(), zone, []libdns.Record{
 			libdns.Record{
 				Type: "TXT",
 				Name: testName,
+			},
+		})
+
+		if err != nil {
+			log.Fatalln("ERROR: %s\n", err.Error())
+		}
+
+		fmt.Println("deleteRecords")
+		fmt.Println(deleteRecords)
+
+		deleteRecords, err = provider.DeleteRecords(context.TODO(), zone, []libdns.Record{
+			libdns.Record{
+				Type: "TXT",
+				Name: testName + ".no_exist",
 			},
 		})
 
