@@ -3,7 +3,7 @@ module github.com/libdns/netlify
 go 1.18
 
 require (
-	github.com/libdns/libdns v0.2.1
+	github.com/libdns/libdns v0.2.2
 	github.com/netlify/open-api/v2 v2.12.2
 )
 
@@ -19,7 +19,6 @@ require (
 	github.com/go-openapi/strfmt v0.21.3 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/go-openapi/validate v0.20.0 // indirect
-	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect

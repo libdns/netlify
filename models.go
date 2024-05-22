@@ -22,7 +22,7 @@ func (r netlifyDNSRecord) libdnsRecord(zone string) libdns.Record {
 		Value:    r.Value,
 		TTL:      time.Duration(r.TTL) * time.Second,
 		ID:       r.ID,
-		Priority: int(r.Priority),
+		Priority: uint(r.Priority),
 	}
 }
 
