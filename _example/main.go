@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-
 	"github.com/libdns/libdns"
+
 	netlify "github.com/libdns/netlify"
 )
 
@@ -41,19 +41,18 @@ func main() {
 	hasTestName := false
 
 	for _, record := range records {
-		fmt.Printf("%s (.%s): %s, %s\n", record.Name, zone, record.Value, record.Type)
-		if record.Name == testName {
+		fmt.Printf("%s (.%s): %s, %s\n", record.RR().Name, zone, record.RR().Data, record.RR().Type)
+		if record.RR().Name == testName {
 			hasTestName = true
 		}
 	}
 
 	if !hasTestName {
 		appendedRecords, err := provider.AppendRecords(context.TODO(), zone, []libdns.Record{
-			libdns.Record{
-				Type:  "TXT",
-				Name:  testName + "." + zone,
-				TTL:   0,
-				Value: "20HnRk5p6rZd7TXhiMoVEYSjt5OpetC6mdovlTfJ4As",
+			libdns.TXT{
+				Name: testName + "." + zone,
+				TTL:  0,
+				Text: "20HnRk5p6rZd7TXhiMoVEYSjt5OpetC6mdovlTfJ4As",
 			},
 		})
 
@@ -65,11 +64,10 @@ func main() {
 		fmt.Println(appendedRecords)
 
 		editedRecords, err := provider.SetRecords(context.TODO(), zone, []libdns.Record{
-			libdns.Record{
-				Type:  "TXT",
-				Name:  testName,
-				TTL:   0,
-				Value: "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw",
+			libdns.TXT{
+				Name: testName,
+				TTL:  0,
+				Text: "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw",
 			},
 		})
 
@@ -84,8 +82,8 @@ func main() {
 		}
 
 		for _, record := range records {
-			if record.Name == testName {
-				if record.Value == "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw" {
+			if record.RR().Name == testName {
+				if record.RR().Data == "6MK3aXrkLz29tOsD5RQ0n1yx9mCTS8SAtjJptIPw" {
 					fmt.Println("editedRecord")
 					fmt.Println(editedRecords)
 				}
@@ -93,11 +91,10 @@ func main() {
 		}
 
 		editedNoExistRecords, err := provider.SetRecords(context.TODO(), zone, []libdns.Record{
-			libdns.Record{
-				Type:  "TXT",
-				Name:  testName + ".no_exist",
-				TTL:   0,
-				Value: "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t",
+			libdns.TXT{
+				Name: testName + ".no_exist",
+				TTL:  0,
+				Text: "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t",
 			},
 		})
 
@@ -112,8 +109,8 @@ func main() {
 		}
 
 		for _, record := range records {
-			if record.Name == testName + ".no_exist" {
-				if record.Value == "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t" {
+			if record.RR().Name == testName+".no_exist" {
+				if record.RR().Data == "wZF6K7OHXcJvhFCwKnEx8zq3PzObeIYa3YSYdL9t" {
 					fmt.Println("editedNoExistRecord")
 					fmt.Println(editedNoExistRecords)
 				}
@@ -122,8 +119,7 @@ func main() {
 
 	} else {
 		deleteRecords, err := provider.DeleteRecords(context.TODO(), zone, []libdns.Record{
-			libdns.Record{
-				Type: "TXT",
+			libdns.TXT{
 				Name: testName,
 			},
 		})
@@ -136,8 +132,7 @@ func main() {
 		fmt.Println(deleteRecords)
 
 		deleteRecords, err = provider.DeleteRecords(context.TODO(), zone, []libdns.Record{
-			libdns.Record{
-				Type: "TXT",
+			libdns.TXT{
 				Name: testName + ".no_exist",
 			},
 		})
